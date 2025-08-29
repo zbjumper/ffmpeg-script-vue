@@ -107,7 +107,9 @@
           </template>
         </div>
       </el-form-item>
-      
+      <el-form-item label="CRF">
+        <el-slider v-model="form.crf" min="18" max="28" show-input />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onCopyScript">复制到剪切板</el-button>
         <el-button @click="resetForm">重置</el-button>
@@ -138,6 +140,7 @@ const form = reactive({
     second: 0,
     millisecond: 0,
   },
+  crf: 23,
 });
 
 const onCopyScript = () => {
@@ -184,7 +187,7 @@ const output = computed(() => {
         : null,
       `-c:v libx264`,
       `-preset slow`,
-      `-crf 28`,
+      `-crf ${form.crf}`,
       `-c:a aac`,
       `-b:a 128k`,
       `-y "${form.outputFileName}"`,
