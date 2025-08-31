@@ -17,4 +17,12 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      '@': '/src',
+    },
+  },
+  server: {
+    port: 5917,
+  }
 });
