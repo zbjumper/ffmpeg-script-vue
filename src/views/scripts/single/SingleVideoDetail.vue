@@ -44,12 +44,16 @@
           />
         </div>
       </el-form-item>
+      <el-form-item label="移除源文件">
+        <div>
+          <el-switch v-model="file.removeOrigin" />
+        </div>
+      </el-form-item>
       <el-form-item>
-        <el-button
-          type="primary"
-          @click="emit('changed', file)"
+        <el-button type="primary" @click="emit('changed', file)"
           >保存并关闭</el-button
         >
+        <el-button type="danger" @click="emit('delete', file)">删除该项</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -66,6 +70,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "changed", file: SingleFileModel): void;
+  (e: "delete", file: SingleFileModel): void;
 }>();
 
 const file = ref(props.file);
@@ -83,17 +88,33 @@ watch(
   }
 );
 
-watch(() => file.value.startTimeEnable, (enable) => {
-  if (enable && !file.value.startTime) {
-    file.value.startTime = { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 };
+watch(
+  () => file.value.startTimeEnable,
+  (enable) => {
+    if (enable && !file.value.startTime) {
+      file.value.startTime = {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        milliseconds: 0,
+      };
+    }
   }
-})
+);
 
-watch(() => file.value.endTimeEnable, (enable) => {
-  if (enable && !file.value.endTime) {
-    file.value.endTime = { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 };
+watch(
+  () => file.value.endTimeEnable,
+  (enable) => {
+    if (enable && !file.value.endTime) {
+      file.value.endTime = {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        milliseconds: 0,
+      };
+    }
   }
-})
+);
 </script>
 
 <style scoped lang="scss"></style>

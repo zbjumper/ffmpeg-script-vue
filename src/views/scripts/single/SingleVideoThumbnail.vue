@@ -1,7 +1,7 @@
 <!-- 单个视屏的概览 -->
 <template>
   <div
-    class="w-[280px] h-[100px] border border-gray-300 rounded-lg flex-col items-center justify-center mx-2 cursor-pointer hover:bg-gray-100 text-xs p-2 overflow-scroll"
+    class="w-[280px] h-[100px] border border-gray-300 rounded-lg flex-col items-center justify-center mx-2 mb-2 cursor-pointer hover:bg-gray-100 text-xs p-2 overflow-scroll"
     @click="$emit('click')"
   >
     <div class="text-red-400">{{ file.inputPath }} </div>

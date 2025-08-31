@@ -9,13 +9,12 @@ export const useScriptStore = defineStore("script", () => {
 
   const commonOptions = ref<CommonOptions>({
     crf: 23,
+    videoCodec: "libx264",
   });
 
   const reset = () => {
-    files.value = [
-      { id: uuid(), modelType: "control" },
-    ];
-    commonOptions.value = { crf: 23 };
+    files.value = [{ id: uuid(), modelType: "control" }];
+    commonOptions.value = { crf: 23, videoCodec: "libx264" };
   };
 
   const outputScript = computed(() => {
@@ -27,14 +26,19 @@ export const useScriptStore = defineStore("script", () => {
         let params = [
           `ffmpeg`,
           `-i "${file.inputPath}"`,
-          `-c:v libx264`,
+          `-c:v ${file.commonOptions?.videoCodec || commonOptions.value.videoCodec}`,
           `-preset slow`,
           `-crf ${commonOptions.value.crf}`,
           `-c:a aac`,
           `-b:a 128k`,
           `-y "${file.outputPath}"`,
         ];
-        return params.join(" ");
+
+        let shells = [params.join(" ")];
+        if (file.removeOrigin) {
+          shells.push(`rm "${file.inputPath}"`);
+        }
+        return shells.join(" && ");
       })
       .join(" && ");
   });

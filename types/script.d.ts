@@ -38,6 +38,8 @@ interface SingleFileModel {
    * 是否移除原文件
    */
   removeOrigin: boolean;
+
+  commonOptions?: CommonOptions;
 }
 
 interface TimeModel {
@@ -59,4 +61,5 @@ type FileListItemModel = SingleFileModel | ControlOptionsModel;
 
 type CommonOptions = {
   crf: number;
+  videoCodec: string;
 }

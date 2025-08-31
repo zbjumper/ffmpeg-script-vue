@@ -19,7 +19,11 @@
                 >
               </div>
               <div>
-                <el-button type="primary" color="pink" icon="Plus" @click="showDrawer(-1)"
+                <el-button
+                  type="primary"
+                  color="pink"
+                  icon="Plus"
+                  @click="showDrawer(-1)"
                   >手动添加</el-button
                 >
               </div>
@@ -33,13 +37,35 @@
           </template>
         </div>
       </el-form-item>
-      <el-form-item label="CRF">
-        <el-slider
-          v-model="scriptStore.commonOptions.crf"
-          :min="18"
-          :max="28"
-          show-input
-        />
+      <el-form-item label="全局默认通用参数">
+        <div class="flex flex-row items-center mb-2 w-full flex-nowrap">
+          <div class="grow border border-gray-300 rounded-lg p-4">
+            <div>视频参数</div>
+            <el-select
+              v-model="scriptStore.commonOptions.videoCodec"
+              placeholder="选择视频编解码器"
+              style="width: 200px"
+            >
+              <el-option label="H.264 (libx264)" value="libx264" />
+              <el-option label="H.265 (libx265)" value="libx265" />
+              <el-option label="AV1 (libaom-av1)" value="libaom-av1" />
+              <el-option label="VP9 (libvpx-vp9)" value="libvpx-vp9" />
+            </el-select>
+            <div class="flex flex-row items-center mt-4">
+              <div>CRF</div>
+              <el-slider
+                v-model="scriptStore.commonOptions.crf"
+                class="ml-4"
+                :min="18"
+                :max="28"
+                show-input
+              />
+            </div>
+          </div>
+          <div class="grow border border-gray-300 rounded-lg p-4 ml-4">
+            <div>音频参数</div>
+          </div>
+        </div>
       </el-form-item>
       <el-form-item>
         <el-button
@@ -62,6 +88,7 @@
         v-if="inEditingFile"
         :file="inEditingFile"
         @changed="onEditorChanged"
+        @delete="onDelete"
       />
     </el-drawer>
   </div>
@@ -106,6 +133,14 @@ const onEditorChanged = (file: SingleFileModel) => {
   } else {
     // 添加新的文件
     scriptStore.files.splice(scriptStore.files.length - 1, 0, file);
+  }
+  isDrawerShow.value = false;
+};
+
+const onDelete = (file: SingleFileModel) => {
+  const idx = scriptStore.files.findIndex((f) => f.id === file.id);
+  if (idx >= 0) {
+    scriptStore.files.splice(idx, 1);
   }
   isDrawerShow.value = false;
 };
