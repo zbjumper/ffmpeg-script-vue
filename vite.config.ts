@@ -22,6 +22,10 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  define: {
+    global: 'globalThis',
+    'process.env': {},
+  },
   server: {
     port: 5917,
   }

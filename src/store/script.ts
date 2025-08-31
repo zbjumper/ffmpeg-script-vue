@@ -1,100 +1,48 @@
-import { getRelativePath } from "@/utils/path";
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
+import { v4 as uuid } from "uuid";
 
 export const useScriptStore = defineStore("script", () => {
-  const cwd = ref("");
-  const inputFileName = ref("");
-  const outputFileName = ref("");
+  const files = ref<FileListItemModel[]>([
+    { id: uuid(), modelType: "control" },
+  ]);
 
-  const startTimeEnable = ref(false);
-  const startTime = ref<TimeModel>({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    milliseconds: 0,
+  const commonOptions = ref<CommonOptions>({
+    crf: 23,
   });
-  const endTimeEnable = ref(false);
-  const endTime = ref<TimeModel>({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    milliseconds: 0,
-  });
-
-  const crf = ref(23);
 
   const reset = () => {
-    inputFileName.value = "";
-    outputFileName.value = "";
-    startTimeEnable.value = false;
-    startTime.value = {
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      milliseconds: 0,
-    };
-    endTimeEnable.value = false;
-    endTime.value = {
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      milliseconds: 0,
-    };
-    crf.value = 23;
+    files.value = [
+      { id: uuid(), modelType: "control" },
+    ];
+    commonOptions.value = { crf: 23 };
   };
 
   const outputScript = computed(() => {
-    if (inputFileName.value || outputFileName.value) {
-      let params = [
-        `ffmpeg`,
-        `-i "${getRelativePath(cwd.value, inputFileName.value)}"`,
-        startTimeEnable.value
-          ? `-ss ${String(startTime.value.hours).padStart(2, "0")}:${String(
-              startTime.value.minutes
-            ).padStart(2, "0")}:${String(startTime.value.seconds).padStart(
-              2,
-              "0"
-            )}.${String(startTime.value.milliseconds).padStart(3, "0")}`
-          : null,
-        // 只有开始时间开启且结束时间开启时，拼接 -to
-        startTimeEnable.value && endTimeEnable.value
-          ? `-to ${String(endTime.value.hours).padStart(2, "0")}:${String(
-              endTime.value.minutes
-            ).padStart(2, "0")}:${String(endTime.value.seconds).padStart(
-              2,
-              "0"
-            )}.${String(endTime.value.milliseconds).padStart(3, "0")}`
-          : null,
-        `-c:v libx264`,
-        `-preset slow`,
-        `-crf ${crf.value}`,
-        `-c:a aac`,
-        `-b:a 128k`,
-        `-y "${outputFileName.value}"`,
-      ];
-
-      return params.filter((item) => item != null).join(" ");
-    } else {
-      return "";
-    }
+    // You may need to define startTimeEnable, endTimeEnable, startTime, endTime, crf, etc.
+    // For now, only basic script generation is implemented.
+    return files.value
+      .filter((file) => file.modelType == "file")
+      .map((file) => {
+        let params = [
+          `ffmpeg`,
+          `-i "${file.inputPath}"`,
+          `-c:v libx264`,
+          `-preset slow`,
+          `-crf ${commonOptions.value.crf}`,
+          `-c:a aac`,
+          `-b:a 128k`,
+          `-y "${file.outputPath}"`,
+        ];
+        return params.join(" ");
+      })
+      .join(" && ");
   });
 
-  const onSelectCwd = (newCwd: string) => {
-    cwd.value = newCwd;
-  }
-
   return {
-    cwd,
-    inputFileName,
-    outputFileName,
-    startTimeEnable,
-    startTime,
-    endTimeEnable,
-    endTime,
-    crf,
+    files,
+    commonOptions,
     outputScript,
     reset,
-    onSelectCwd,
   };
 });

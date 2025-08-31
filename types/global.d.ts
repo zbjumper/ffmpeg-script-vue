@@ -1,12 +1,15 @@
 interface Window {
-
   /**
    * 显示一个允许用户选择一个目录的目录选择器
    * @param options 参数
    */
   showDirectoryPicker(
-    options: ShowDirectoryPickerOptions,
+    options: ShowDirectoryPickerOptions
   ): Promise<FileSystemDirectoryHandle>;
+
+  showOpenFilePicker(
+    options: ShowOpenFilePickerOptions
+  ): Promise<FileSystemFileHandle[]>;
 }
 
 type ShowDirectoryPickerOptions = {
@@ -53,10 +56,3 @@ type ShowOpenFilePickerOptions = {
     };
   }>;
 };
-
-interface TimeModel {
-  hours: 0;
-  minutes: 0;
-  seconds: 0;
-  milliseconds: 0;
-}
