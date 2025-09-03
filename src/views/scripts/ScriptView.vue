@@ -11,7 +11,7 @@
           >
             <div
               v-if="file.modelType == 'control'"
-              class="mx-2 w-[280px] h-[100px] border border-gray-300 rounded-lg flex flex-col items-center justify-center"
+              class="mx-2 mb-2 w-[280px] h-[100px] border border-gray-300 rounded-lg flex flex-col items-center justify-center"
             >
               <div>
                 <el-button type="primary" icon="Upload" @click="onChooseFiles"
@@ -42,19 +42,19 @@
           <div class="grow border border-gray-300 rounded-lg p-4">
             <div>视频参数</div>
             <el-select
-              v-model="scriptStore.commonOptions.videoCodec"
+              v-model="scriptStore.globalOptions.videoCodec"
               placeholder="选择视频编解码器"
               style="width: 200px"
             >
               <el-option label="H.264 (libx264)" value="libx264" />
               <el-option label="H.265 (libx265)" value="libx265" />
-              <el-option label="AV1 (libaom-av1)" value="libaom-av1" />
-              <el-option label="VP9 (libvpx-vp9)" value="libvpx-vp9" />
+              <!-- <el-option label="AV1 (libaom-av1)" value="libaom-av1" />
+              <el-option label="VP9 (libvpx-vp9)" value="libvpx-vp9" /> -->
             </el-select>
             <div class="flex flex-row items-center mt-4">
               <div>CRF</div>
               <el-slider
-                v-model="scriptStore.commonOptions.crf"
+                v-model="scriptStore.globalOptions.crf"
                 class="ml-4"
                 :min="18"
                 :max="28"
@@ -65,6 +65,14 @@
           <div class="grow border border-gray-300 rounded-lg p-4 ml-4">
             <div>音频参数</div>
           </div>
+        </div>
+      </el-form-item>
+      <el-form-item label="静默覆盖同名文件">
+        <el-switch v-model="scriptStore.globalOptions.overwrite" />
+      </el-form-item>
+      <el-form-item label="移除源文件">
+        <div>
+          <el-switch v-model="scriptStore.globalOptions.removeOrigin" />
         </div>
       </el-form-item>
       <el-form-item>
@@ -119,7 +127,6 @@ const showDrawer = (index: number) => {
       modelType: "file",
       startTimeEnable: false,
       endTimeEnable: false,
-      removeOrigin: false,
     };
   }
   isDrawerShow.value = true;
@@ -183,6 +190,7 @@ const onChooseFiles = () => {
             startTimeEnable: false,
             endTimeEnable: false,
             removeOrigin: false,
+            commonOptions: {},
           } as SingleFileModel);
         }
       }

@@ -25,7 +25,7 @@
         ></el-input>
       </el-form-item>
       <el-form-item label="设定开始时间">
-        <div>
+        <div class="flex flex-row items-center">
           <el-switch v-model="file.startTimeEnable" />
           <time-selector
             v-if="file.startTimeEnable && file.startTime"
@@ -36,17 +36,12 @@
 
       <!-- 当开始时间开启时，显示设定结束时间 -->
       <el-form-item label="设定结束时间" v-if="file.startTimeEnable">
-        <div>
+        <div class="flex flex-row items-center">
           <el-switch v-model="file.endTimeEnable" />
           <time-selector
             v-if="file.endTimeEnable && file.endTime"
             v-model="file.endTime"
           />
-        </div>
-      </el-form-item>
-      <el-form-item label="移除源文件">
-        <div>
-          <el-switch v-model="file.removeOrigin" />
         </div>
       </el-form-item>
       <el-form-item>

@@ -7,14 +7,21 @@ export const useScriptStore = defineStore("script", () => {
     { id: uuid(), modelType: "control" },
   ]);
 
-  const commonOptions = ref<CommonOptions>({
+  const globalOptions = ref<GlobalOptions>({
     crf: 23,
     videoCodec: "libx264",
+    overwrite: true,
+    removeOrigin: false,
   });
 
   const reset = () => {
     files.value = [{ id: uuid(), modelType: "control" }];
-    commonOptions.value = { crf: 23, videoCodec: "libx264" };
+    globalOptions.value = {
+      crf: 23,
+      videoCodec: "libx264",
+      overwrite: false,
+      removeOrigin: false,
+    };
   };
 
   const outputScript = computed(() => {
@@ -26,16 +33,20 @@ export const useScriptStore = defineStore("script", () => {
         let params = [
           `ffmpeg`,
           `-i "${file.inputPath}"`,
-          `-c:v ${file.commonOptions?.videoCodec || commonOptions.value.videoCodec}`,
+          `-c:v ${globalOptions.value.videoCodec}`,
           `-preset slow`,
-          `-crf ${commonOptions.value.crf}`,
+          `-crf ${globalOptions.value.crf}`,
           `-c:a aac`,
           `-b:a 128k`,
-          `-y "${file.outputPath}"`,
+          globalOptions.value.overwrite ? `-y` : null,
+          `"${file.outputPath}"`,
         ];
+        console.info(params);
 
-        let shells = [params.join(" ")];
-        if (file.removeOrigin) {
+        let shells = [params.filter((item) => item != null).join(" ")];
+        if (
+          globalOptions.value.removeOrigin
+        ) {
           shells.push(`rm "${file.inputPath}"`);
         }
         return shells.join(" && ");
@@ -45,7 +56,7 @@ export const useScriptStore = defineStore("script", () => {
 
   return {
     files,
-    commonOptions,
+    globalOptions,
     outputScript,
     reset,
   };

@@ -1,5 +1,4 @@
 interface SingleFileModel {
-
   id: string;
 
   modelType: "file";
@@ -33,13 +32,6 @@ interface SingleFileModel {
    * 结束时间
    */
   endTime?: TimeModel;
-
-  /**
-   * 是否移除原文件
-   */
-  removeOrigin: boolean;
-
-  commonOptions?: CommonOptions;
 }
 
 interface TimeModel {
@@ -59,7 +51,34 @@ interface ControlOptionsModel {
 
 type FileListItemModel = SingleFileModel | ControlOptionsModel;
 
-type CommonOptions = {
+type GlobalOptions = {
+  /**
+   * 视频参数
+   */
   crf: number;
-  videoCodec: string;
-}
+
+  /**
+   * 视频编码器
+   */
+  videoCodec: VideoCodec;
+
+  /**
+   * 静默覆盖同名文件
+   */
+  overwrite: boolean;
+
+  /**
+   * 是否移除源文件
+   */
+  removeOrigin: boolean;
+};
+
+type VideoCodec = "libx264" | "libx265";
+// | "libvpx-vp9"
+// | "libaom-av1"
+// | "mpeg4"
+// | "h264_nvenc"
+// | "hevc_nvenc"
+// | "vp8_nvenc"
+// | "vp9_nvenc"
+// | "av1_nvenc";
