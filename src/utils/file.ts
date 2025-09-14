@@ -11,7 +11,7 @@ export const getDefaultOutputFilePath = (inputFilePath: string, extra: string = 
     return `${inputFilePath}.${extra}`;
   } else {
     const name = inputFilePath.substring(0, dotIndex);
-    const ext = inputFilePath.substring(dotIndex); // 包含点
-    return `${name}.${extra}${ext}`;
+    // const ext = inputFilePath.substring(dotIndex); // 包含点
+    return `${name}.${extra}.mp4`;
   }
 };
