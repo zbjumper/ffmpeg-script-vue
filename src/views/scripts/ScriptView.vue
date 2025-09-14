@@ -14,16 +14,10 @@
               class="mx-2 mb-2 w-[280px] h-[100px] border border-gray-300 rounded-lg flex flex-col items-center justify-center"
             >
               <div>
-                <el-button type="primary" icon="Upload" @click="onChooseFiles"
-                  >选择文件</el-button
-                >
+                <el-button type="primary" icon="Upload" @click="onChooseFiles">选择文件</el-button>
               </div>
               <div>
-                <el-button
-                  type="primary"
-                  color="pink"
-                  icon="Plus"
-                  @click="showDrawer(-1)"
+                <el-button type="primary" color="pink" icon="Plus" @click="showDrawer(-1)"
                   >手动添加</el-button
                 >
               </div>
@@ -41,18 +35,13 @@
         <div class="flex flex-row items-center mb-2 w-full flex-nowrap">
           <div class="grow border border-gray-300 rounded-lg p-4">
             <div>视频参数</div>
-            <el-select
-              v-model="scriptStore.globalOptions.videoCodec"
-              placeholder="选择视频编解码器"
-              style="width: 200px"
-            >
-              <el-option label="H.264 (libx264)" value="libx264" />
-              <el-option label="H.265 (libx265)" value="libx265" />
-              <!-- <el-option label="AV1 (libaom-av1)" value="libaom-av1" />
-              <el-option label="VP9 (libvpx-vp9)" value="libvpx-vp9" /> -->
-            </el-select>
+            <!-- 选择视频编解码器 -->
+            <el-radio-group v-model="scriptStore.globalOptions.videoCodec">
+              <el-radio-button value="libx264">H.264</el-radio-button>
+              <el-radio-button value="libx265">H.265</el-radio-button>
+            </el-radio-group>
             <div class="flex flex-row items-center mt-4">
-              <div>CRF</div>
+              <div>CRF(Constant Rate Factor)</div>
               <el-slider
                 v-model="scriptStore.globalOptions.crf"
                 class="ml-4"
@@ -61,6 +50,15 @@
                 show-input
               />
             </div>
+            <el-select
+              v-model="scriptStore.globalOptions.clarity"
+              placeholder="选择清晰度"
+              default-first-option
+            >
+              <el-option label="保持原样" value="default"></el-option>
+              <el-option label="720P" value="720P"></el-option>
+              <el-option label="1080P" value="1080P"></el-option>
+            </el-select>
           </div>
           <div class="grow border border-gray-300 rounded-lg p-4 ml-4">
             <div>音频参数</div>
@@ -86,12 +84,7 @@
       </el-form-item>
     </el-form>
     <div>{{ scriptStore.outputScript }}</div>
-    <el-drawer
-      v-model="isDrawerShow"
-      :size="'960px'"
-      :with-header="false"
-      direction="rtl"
-    >
+    <el-drawer v-model="isDrawerShow" :size="'960px'" :with-header="false" direction="rtl">
       <SingleVideoDetail
         v-if="inEditingFile"
         :file="inEditingFile"

@@ -51,6 +51,9 @@ interface ControlOptionsModel {
 
 type FileListItemModel = SingleFileModel | ControlOptionsModel;
 
+/**
+ * 全局参数
+ */
 type GlobalOptions = {
   /**
    * 视频参数
@@ -61,6 +64,11 @@ type GlobalOptions = {
    * 视频编码器
    */
   videoCodec: VideoCodec;
+
+  /**
+   * 清晰度
+   */
+  clarity: "default" | "720P" | "1080P";
 
   /**
    * 静默覆盖同名文件

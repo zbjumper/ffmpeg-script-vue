@@ -1,27 +1,20 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { v4 as uuid } from "uuid";
+import { defaultGlobalOptions } from "@/constant";
+import { computeTimeOptions } from "@/utils/time";
+import { computeVideoSizeOptions } from "@/utils/video";
 
 export const useScriptStore = defineStore("script", () => {
   const files = ref<FileListItemModel[]>([
     { id: uuid(), modelType: "control" },
   ]);
 
-  const globalOptions = ref<GlobalOptions>({
-    crf: 23,
-    videoCodec: "libx264",
-    overwrite: true,
-    removeOrigin: false,
-  });
+  const globalOptions = ref<GlobalOptions>(defaultGlobalOptions);
 
   const reset = () => {
     files.value = [{ id: uuid(), modelType: "control" }];
-    globalOptions.value = {
-      crf: 23,
-      videoCodec: "libx264",
-      overwrite: false,
-      removeOrigin: false,
-    };
+    globalOptions.value = defaultGlobalOptions;
   };
 
   const outputScript = computed(() => {
@@ -33,20 +26,23 @@ export const useScriptStore = defineStore("script", () => {
         let params = [
           `ffmpeg`,
           `-i "${file.inputPath}"`,
+          computeVideoSizeOptions(globalOptions.value.clarity),
           `-c:v ${globalOptions.value.videoCodec}`,
           `-preset slow`,
           `-crf ${globalOptions.value.crf}`,
           `-c:a aac`,
           `-b:a 128k`,
+          computeTimeOptions(
+            file.startTimeEnable ? file.startTime : undefined,
+            file.endTimeEnable ? file.endTime : undefined
+          ),
           globalOptions.value.overwrite ? `-y` : null,
           `"${file.outputPath}"`,
         ];
         console.info(params);
 
         let shells = [params.filter((item) => item != null).join(" ")];
-        if (
-          globalOptions.value.removeOrigin
-        ) {
+        if (globalOptions.value.removeOrigin) {
           shells.push(`rm "${file.inputPath}"`);
         }
         return shells.join(" && ");
