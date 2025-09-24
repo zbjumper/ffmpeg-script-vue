@@ -1,7 +1,7 @@
 <!-- 脚本表单 -->
 <template>
   <div class="w-[1280px]">
-    <el-form label-width="180px" class="m-4">
+    <el-form label-width="120px" class="m-4">
       <el-form-item label="文件列表" required>
         <div class="flex items-center flex-wrap">
           <template
@@ -29,48 +29,6 @@
               @click="showDrawer(scriptStore.files.indexOf(file))"
             />
           </template>
-        </div>
-      </el-form-item>
-      <el-form-item label="全局默认通用参数">
-        <div class="flex flex-row items-center mb-2 w-full flex-nowrap">
-          <div class="grow border border-gray-300 rounded-lg p-4">
-            <div>视频参数</div>
-            <!-- 选择视频编解码器 -->
-            <el-radio-group v-model="scriptStore.globalOptions.videoCodec">
-              <el-radio-button value="libx264">H.264</el-radio-button>
-              <el-radio-button value="libx265">H.265</el-radio-button>
-            </el-radio-group>
-            <div class="flex flex-row items-center mt-4">
-              <div>CRF(Constant Rate Factor)</div>
-              <el-slider
-                v-model="scriptStore.globalOptions.crf"
-                class="ml-4"
-                :min="18"
-                :max="28"
-                show-input
-              />
-            </div>
-            <el-select
-              v-model="scriptStore.globalOptions.clarity"
-              placeholder="选择清晰度"
-              default-first-option
-            >
-              <el-option label="保持原样" value="default"></el-option>
-              <el-option label="720P" value="720P"></el-option>
-              <el-option label="1080P" value="1080P"></el-option>
-            </el-select>
-          </div>
-          <div class="grow border border-gray-300 rounded-lg p-4 ml-4">
-            <div>音频参数</div>
-          </div>
-        </div>
-      </el-form-item>
-      <el-form-item label="静默覆盖同名文件">
-        <el-switch v-model="scriptStore.globalOptions.overwrite" />
-      </el-form-item>
-      <el-form-item label="移除源文件">
-        <div>
-          <el-switch v-model="scriptStore.globalOptions.removeOrigin" />
         </div>
       </el-form-item>
       <el-form-item>

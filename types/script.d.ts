@@ -66,6 +66,11 @@ type GlobalOptions = {
   videoCodec: VideoCodec;
 
   /**
+   * 音频编码器
+   */
+  audioCodec: AudioCodec;
+
+  /**
    * 清晰度
    */
   clarity: "default" | "720P" | "1080P";
@@ -81,7 +86,7 @@ type GlobalOptions = {
   removeOrigin: boolean;
 };
 
-type VideoCodec = "libx264" | "libx265";
+type VideoCodec = "copy" | "libx264" | "libx265";
 // | "libvpx-vp9"
 // | "libaom-av1"
 // | "mpeg4"
@@ -90,3 +95,5 @@ type VideoCodec = "libx264" | "libx265";
 // | "vp8_nvenc"
 // | "vp9_nvenc"
 // | "av1_nvenc";
+
+type AudioCodec = "copy" | "aac" | "mp3";

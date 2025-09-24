@@ -1,7 +1,8 @@
 export const defaultGlobalOptions: GlobalOptions = {
   crf: 23,
-  videoCodec: "libx264",
+  videoCodec: "copy",
   overwrite: true,
   removeOrigin: false,
-  clarity: "default"
+  clarity: "default",
+  audioCodec: "copy"
 };

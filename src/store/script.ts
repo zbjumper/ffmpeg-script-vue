@@ -30,7 +30,7 @@ export const useScriptStore = defineStore("script", () => {
           `-c:v ${globalOptions.value.videoCodec}`,
           `-preset slow`,
           `-crf ${globalOptions.value.crf}`,
-          `-c:a aac`,
+          `-c:a ${globalOptions.value.audioCodec}`,
           `-b:a 128k`,
           computeTimeOptions(
             file.startTimeEnable ? file.startTime : undefined,

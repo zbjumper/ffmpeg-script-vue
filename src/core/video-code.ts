@@ -1,0 +1,1 @@
+export type VideoCodec = "libx264" | "libx265";
