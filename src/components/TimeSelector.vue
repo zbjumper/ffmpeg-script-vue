@@ -40,7 +40,7 @@
 
 
 defineProps<{
-  modelValue: TimeModel;
+  modelValue: TimePoint;
 }>();
 </script>
 

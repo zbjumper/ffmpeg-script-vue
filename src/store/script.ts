@@ -1,19 +1,16 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { v4 as uuid } from "uuid";
 import { defaultGlobalOptions } from "@/constant";
 import { computeTimeOptions } from "@/utils/time";
 import { computeVideoSizeOptions } from "@/utils/video";
 
 export const useScriptStore = defineStore("script", () => {
-  const files = ref<FileListItemModel[]>([
-    { id: uuid(), modelType: "control" },
-  ]);
+  const files = ref<SingleFileModel[]>([]);
 
   const globalOptions = ref<GlobalOptions>(defaultGlobalOptions);
 
   const reset = () => {
-    files.value = [{ id: uuid(), modelType: "control" }];
+    files.value = [];
     globalOptions.value = defaultGlobalOptions;
   };
 

@@ -21,7 +21,7 @@ interface SingleFileModel {
   /**
    * 开始时间
    */
-  startTime?: TimeModel;
+  startTime?: TimePoint;
 
   /**
    * 结束时间选择器是否启用
@@ -31,25 +31,8 @@ interface SingleFileModel {
   /**
    * 结束时间
    */
-  endTime?: TimeModel;
+  endTime?: TimePoint;
 }
-
-interface TimeModel {
-  hours: 0;
-  minutes: 0;
-  seconds: 0;
-  milliseconds: 0;
-}
-
-interface ControlOptionsModel {
-  id: string;
-  /**
-   * 手动添加
-   */
-  modelType: "control";
-}
-
-type FileListItemModel = SingleFileModel | ControlOptionsModel;
 
 /**
  * 全局参数
@@ -73,7 +56,7 @@ type GlobalOptions = {
   /**
    * 清晰度
    */
-  clarity: "default" | "720P" | "1080P";
+  clarity: Clarity;
 
   /**
    * 静默覆盖同名文件
@@ -85,15 +68,3 @@ type GlobalOptions = {
    */
   removeOrigin: boolean;
 };
-
-type VideoCodec = "copy" | "libx264" | "libx265";
-// | "libvpx-vp9"
-// | "libaom-av1"
-// | "mpeg4"
-// | "h264_nvenc"
-// | "hevc_nvenc"
-// | "vp8_nvenc"
-// | "vp9_nvenc"
-// | "av1_nvenc";
-
-type AudioCodec = "copy" | "aac" | "mp3";

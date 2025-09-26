@@ -3,7 +3,7 @@
  * @param time 时间模型
  * @returns 格式化的时间字符串
  */
-export const formatTime = (time?: TimeModel): string => {
+export const formatTime = (time?: TimePoint): string => {
   if (time) {
     const hours = time.hours.toString().padStart(2, '0');
     const minutes = time.minutes.toString().padStart(2, '0');
@@ -22,7 +22,7 @@ export const formatTime = (time?: TimeModel): string => {
  * @param end 结束时间
  * @returns 时间参数字符串，如果 start 和 end 都为空则返回 null
  */
-export const computeTimeOptions = (start?: TimeModel, end?: TimeModel): string | null => {
+export const computeTimeOptions = (start?: TimePoint, end?: TimePoint): string | null => {
   // 如果 start 和 end 都为空，返回 null
   if (!start && !end) {
     return null;

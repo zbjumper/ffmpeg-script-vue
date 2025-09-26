@@ -20,16 +20,16 @@
       </el-menu>
     </el-col>
     <el-col :span="20">
-      <div v-if="showPanel === 'convert'"><GlobalConvertSettings /></div>
-      <div v-else-if="showPanel === 'snapshot'">截图参数设置面板</div>
-      <div v-else-if="showPanel === 'concat'">拼接参数设置面板</div>
+      <template v-if="showPanel === 'convert'"><GlobalConvertSettings /></template>
+      <template v-else-if="showPanel === 'snapshot'">截图参数设置面板</template>
+      <template v-else-if="showPanel === 'concat'">拼接参数设置面板</template>
     </el-col>
   </el-row>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import GlobalConvertSettings from './items/GlobalConvertSettings.vue';
+import GlobalConvertSettings from '@/views/settings/items/GlobalConvertSettings.vue';
 
 const showPanel = ref<'convert' | 'snapshot' | 'concat'>('convert');
 

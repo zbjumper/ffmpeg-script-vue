@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import GlobalSettings from "./settings/GlobalSettings.vue";
+import GlobalSettings from "@/views/settings/GlobalSettings.vue";
 
 const dialogFormVisible = ref(false);
 </script>

@@ -2,29 +2,9 @@
 <template>
   <div>
     <el-form label-width="150px">
-      <el-form-item label="视频编码格式">
-        <el-radio-group v-model="scriptStore.globalOptions.videoCodec">
-          <el-radio-button value="copy">保持原样</el-radio-button>
-          <el-radio-button value="libx264">H.264</el-radio-button>
-          <el-radio-button value="libx265">H.265</el-radio-button>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="CRF">
-        <el-slider
-          v-model="scriptStore.globalOptions.crf"
-          class="ml-4"
-          :min="18"
-          :max="28"
-          show-input
-        />
-      </el-form-item>
-      <el-form-item label="视频清晰度">
-        <el-radio-group v-model="scriptStore.globalOptions.clarity">
-          <el-radio-button value="default">保持原样</el-radio-button>
-          <el-radio-button value="720P">720P</el-radio-button>
-          <el-radio-button value="1080P">1080P</el-radio-button>
-        </el-radio-group>
-      </el-form-item>
+      <video-codec v-model="scriptStore.globalOptions.videoCodec" />
+      <crf v-model="scriptStore.globalOptions.crf" />
+      <clarity v-model="scriptStore.globalOptions.clarity" />
       <el-form-item label="音频编码格式">
         <el-radio-group v-model="scriptStore.globalOptions.audioCodec">
           <el-radio-button value="copy">保持原样</el-radio-button>
@@ -44,6 +24,9 @@
 
 <script setup lang="ts">
 import { useScriptStore } from "@/store";
+import VideoCodec from "@/components/video/VideoCodec.vue";
+import Crf from "@/components/video/Crf.vue";
+import Clarity from "@/components/video/Clarity.vue";
 
 defineOptions({
   name: "GlobalConvertSettings",

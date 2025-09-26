@@ -44,12 +44,6 @@
           />
         </div>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="emit('changed', file)"
-          >保存并关闭</el-button
-        >
-        <el-button type="danger" @click="emit('delete', file)">删除该项</el-button>
-      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -59,16 +53,15 @@ import { ref, watch } from "vue";
 import TimeSelector from "@/components/TimeSelector.vue";
 import { getDefaultOutputFilePath } from "@/utils/file";
 
-const props = defineProps<{
-  file: SingleFileModel;
-}>();
+const file = defineModel<SingleFileModel>({
+  type: Object,
+  required: true,
+});
+// const props = defineProps<{
+//   file: SingleFileModel;
+// }>();
 
-const emit = defineEmits<{
-  (e: "changed", file: SingleFileModel): void;
-  (e: "delete", file: SingleFileModel): void;
-}>();
-
-const file = ref(props.file);
+// const file = ref(props.file);
 
 const onInputFileBlur = () => {
   if (file.value.inputPath && !file.value.outputPath) {
@@ -76,12 +69,12 @@ const onInputFileBlur = () => {
   }
 };
 
-watch(
-  () => props.file,
-  (newFile) => {
-    file.value = newFile;
-  }
-);
+// watch(
+//   () => props.file,
+//   (newFile) => {
+//     file.value = newFile;
+//   }
+// );
 
 watch(
   () => file.value.startTimeEnable,

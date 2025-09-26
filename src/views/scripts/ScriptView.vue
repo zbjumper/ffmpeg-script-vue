@@ -2,6 +2,17 @@
 <template>
   <div class="w-[1280px]">
     <el-form label-width="120px" class="m-4">
+      <el-form-item label="操作" prop="">
+        <el-dropdown split-button type="primary" @command="handleCommand">
+          添加转换任务
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="choose-files">选择文件(支持多选)</el-dropdown-item>
+              <el-dropdown-item command="manual-add">手动添加</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </el-form-item>
       <el-form-item label="文件列表" required>
         <div class="flex items-center flex-wrap">
           <template
@@ -9,22 +20,7 @@
             v-for="file in scriptStore.files"
             :key="file.id"
           >
-            <div
-              v-if="file.modelType == 'control'"
-              class="mx-2 mb-2 w-[280px] h-[100px] border border-gray-300 rounded-lg flex flex-col items-center justify-center"
-            >
-              <div>
-                <el-button type="primary" icon="Upload" @click="onChooseFiles">选择文件</el-button>
-              </div>
-              <div>
-                <el-button type="primary" color="pink" icon="Plus" @click="showDrawer(-1)"
-                  >手动添加</el-button
-                >
-              </div>
-            </div>
-            <!-- 单个视频的缩略图 -->
             <single-video-thumbnail
-              v-else
               :file="file"
               @click="showDrawer(scriptStore.files.indexOf(file))"
             />
@@ -42,14 +38,32 @@
       </el-form-item>
     </el-form>
     <div>{{ scriptStore.outputScript }}</div>
-    <el-drawer v-model="isDrawerShow" :size="'960px'" :with-header="false" direction="rtl">
+    <el-dialog
+      v-if="inEditingFile"
+      title="新建/编辑"
+      width="600px"
+      v-model="isDrawerShow"
+      @close="() => {}"
+    >
+      <SingleVideoDetail
+        v-if="inEditingFile"
+        v-model="inEditingFile"
+      />
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="onEditorChanged(inEditingFile)">保存并关闭</el-button>
+          <el-button type="danger" @click="onDelete(inEditingFile)">删除该项</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <!-- <el-drawer v-model="isDrawerShow" :size="'960px'" :with-header="false" direction="rtl">
       <SingleVideoDetail
         v-if="inEditingFile"
         :file="inEditingFile"
         @changed="onEditorChanged"
         @delete="onDelete"
       />
-    </el-drawer>
+    </el-drawer> -->
   </div>
 </template>
 
@@ -113,6 +127,14 @@ const onCopyScript = () => {
     .catch(() => {
       ElMessage.error("复制失败，请手动复制");
     });
+};
+
+const handleCommand = (command: string) => {
+  if (command === "choose-files") {
+    onChooseFiles();
+  } else if (command === "manual-add") {
+    showDrawer(-1);
+  }
 };
 
 const onChooseFiles = () => {
