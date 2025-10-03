@@ -2,18 +2,21 @@
 <template>
   <div class="w-[1280px]">
     <el-form label-width="120px" class="m-4">
-      <el-form-item label="操作" prop="">
-        <el-dropdown split-button type="primary" @command="handleCommand">
-          添加转换任务
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="choose-files">选择文件(支持多选)</el-dropdown-item>
-              <el-dropdown-item command="manual-add">手动添加</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+      <el-form-item label="操作内容" prop="">
+        <div class="flex flex-row justify-start">
+          <el-dropdown split-button type="primary" @command="handleCommand">
+            添加转换任务
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="choose-files">选择文件(支持多选)</el-dropdown-item>
+                <el-dropdown-item command="manual-add">手动添加</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <el-button class="ml-2" type="primary" @click="handleRenameTask">添加重命名任务</el-button>
+        </div>
       </el-form-item>
-      <el-form-item label="文件列表" required>
+      <el-form-item label="任务列表" required>
         <div class="flex items-center flex-wrap">
           <template
             v-if="scriptStore.files.length > 0"
@@ -137,6 +140,10 @@ const handleCommand = (command: string) => {
   }
 };
 
+const handleRenameTask = () => {
+  // scriptStore.addRenameTask();
+};
+
 const onChooseFiles = () => {
   window
     .showOpenFilePicker({
@@ -154,7 +161,7 @@ const onChooseFiles = () => {
       for (const fileHandle of fileHandles) {
         const file = await fileHandle.getFile();
         if (file) {
-          scriptStore.files.splice(scriptStore.files.length - 1, 0, {
+          scriptStore.files.push({
             id: uuid(),
             inputPath: file.name,
             outputPath: getDefaultOutputFilePath(file.name),

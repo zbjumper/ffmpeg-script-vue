@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { watch } from "vue";
 import TimeSelector from "@/components/TimeSelector.vue";
 import { getDefaultOutputFilePath } from "@/utils/file";
 

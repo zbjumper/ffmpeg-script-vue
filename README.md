@@ -7,8 +7,8 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
 ## 备忘
 
 ### 多任务
-compress
-concat
-rename
-snapshot
-cut
+compress 
+concat 拼接
+rename 重命名，仅根据正则表达式替换，重命名
+snapshot 截图
+cut 裁剪

@@ -15,7 +15,7 @@ export type BasicParameter = {
 /**
  * 转换任务需要的参数
  */
-export type ConvertParameter = {
+export type ConvertParameter = BasicParameter & {
   /**
    * 开始时间，单位毫秒
    */
@@ -47,7 +47,7 @@ export type ConvertParameter = {
    * 是否删除源文件
    */
   removeOrigin: boolean;
-} & BasicParameter;
+};
 
 export type GlobalConvertParameter = Omit<
   ConvertParameter,
