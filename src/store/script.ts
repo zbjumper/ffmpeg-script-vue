@@ -22,6 +22,7 @@ export const useScriptStore = defineStore("script", () => {
       .map((file) => {
         let params = [
           `ffmpeg`,
+          computeTimeOptions(file.startTime, file.endTime),
           `-i "${file.inputPath}"`,
           computeVideoSizeOptions(globalOptions.value.clarity),
           `-c:v ${globalOptions.value.videoCodec}`,
@@ -29,7 +30,6 @@ export const useScriptStore = defineStore("script", () => {
           `-crf ${globalOptions.value.crf}`,
           `-c:a ${globalOptions.value.audioCodec}`,
           `-b:a 128k`,
-          computeTimeOptions(file.startTime, file.endTime),
           globalOptions.value.overwrite ? `-y` : null,
           `"${file.outputPath}"`,
         ];

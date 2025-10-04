@@ -25,7 +25,7 @@
             v-for="file in scriptStore.files"
             :key="file.id"
           >
-            <single-video-thumbnail
+            <ConvertTaskThumbnail
               :file="file"
               @click="showDrawer(scriptStore.files.indexOf(file))"
             />
@@ -50,30 +50,16 @@
       v-model="isDrawerShow"
       @close="() => {}"
     >
-      <SingleVideoDetail v-if="inEditingFile" v-model="inEditingFile" />
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="onEditorChanged(inEditingFile)">保存并关闭</el-button>
-          <el-button type="danger" @click="onDelete(inEditingFile)">删除该项</el-button>
-        </div>
-      </template>
+      <ConvertTaskEditor :task="inEditingFile" @update="onUpdateTask" @delete="onDelete" />
     </el-dialog>
-    <!-- <el-drawer v-model="isDrawerShow" :size="'960px'" :with-header="false" direction="rtl">
-      <SingleVideoDetail
-        v-if="inEditingFile"
-        :file="inEditingFile"
-        @changed="onEditorChanged"
-        @delete="onDelete"
-      />
-    </el-drawer> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ElMessage } from "element-plus";
 import { useScriptStore } from "@/store/";
-import SingleVideoDetail from "../tasks/convert/ConvertTaskEditor.vue";
-import SingleVideoThumbnail from "../tasks/convert/ConvertTaskThumbnail.vue";
+import ConvertTaskEditor from "../tasks/convert/ConvertTaskEditor.vue";
+import ConvertTaskThumbnail from "../tasks/convert/ConvertTaskThumbnail.vue";
 import { ref } from "vue";
 import { v4 as uuid } from "uuid";
 import { getDefaultOutputFilePath } from "@/utils/file";
@@ -100,7 +86,7 @@ const showDrawer = (index: number) => {
   isDrawerShow.value = true;
 };
 
-const onEditorChanged = (file: ConvertTask) => {
+const onUpdateTask = (file: ConvertTask) => {
   const idx = scriptStore.files.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
     // 修改已有的文件

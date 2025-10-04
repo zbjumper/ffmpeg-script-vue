@@ -3,7 +3,7 @@
   <div>
     <el-form
       ref="form"
-      :model="file"
+      :model="task"
       label-width="180px"
       label-position="top"
       require-asterisk-position="right"
@@ -11,7 +11,7 @@
     >
       <el-form-item label="输入视频文件路径" required>
         <el-input
-          v-model="file.inputPath"
+          v-model="task.inputPath"
           placeholder="请输入文件路径，如果是相对路径，则识别为相对于当前工作路径"
           @blur="onInputFileBlur"
           clearable
@@ -19,7 +19,7 @@
       </el-form-item>
       <el-form-item label="输出视频文件路径" required>
         <el-input
-          v-model="file.outputPath"
+          v-model="task.outputPath"
           placeholder="请输入文件名称，如果是相对路径，则识别为相对于当前工作路径"
           clearable
         ></el-input>
@@ -27,10 +27,7 @@
       <el-form-item label="设定开始时间">
         <div class="flex flex-row items-center">
           <el-switch v-model="startTimeEnable" />
-          <time-selector
-            v-if="startTimeEnable && file.startTime"
-            v-model="file.startTime"
-          />
+          <time-selector v-if="startTimeEnable && task.startTime" v-model="task.startTime" />
         </div>
       </el-form-item>
 
@@ -38,77 +35,80 @@
       <el-form-item label="设定结束时间" v-if="startTimeEnable">
         <div class="flex flex-row items-center">
           <el-switch v-model="endTimeEnable" />
-          <time-selector
-            v-if="endTimeEnable && file.endTime"
-            v-model="file.endTime"
-          />
+          <time-selector v-if="endTimeEnable && task.endTime" v-model="task.endTime" />
         </div>
       </el-form-item>
     </el-form>
+    <div class="dialog-footer">
+      <el-button type="primary" @click="onSave">保存并关闭</el-button>
+      <el-button type="danger" @click="onDelete">删除该项</el-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import TimeSelector from "@/components/TimeSelector.vue";
 import { getDefaultOutputFilePath } from "@/utils/file";
-import type { ConvertParameter } from "@/core/task";
+import type { ConvertTask } from "@/core/task";
 
-const file = defineModel<ConvertParameter>({
-  type: Object,
-  required: true,
-});
-// const props = defineProps<{
-//   file: SingleFileModel;
-// }>();
+const props = defineProps<{
+  task: ConvertTask;
+}>();
 
-// const file = ref(props.file);
+const task = ref(props.task);
+
+const emits = defineEmits<{
+  (e: "update", value: ConvertTask): void;
+  (e: "delete", value: ConvertTask): void;
+}>();
 
 const onInputFileBlur = () => {
-  if (file.value.inputPath && !file.value.outputPath) {
-    file.value.outputPath = getDefaultOutputFilePath(file.value.inputPath);
+  if (task.value.inputPath && !task.value.outputPath) {
+    task.value.outputPath = getDefaultOutputFilePath(task.value.inputPath);
   }
 };
 
-// watch(
-//   () => props.file,
-//   (newFile) => {
-//     file.value = newFile;
-//   }
-// );
-
-const startTimeEnable = ref({
-  getter: () => !!file.value.startTime,
-  setter: (val: boolean) => {
+const startTimeEnable = computed({
+  get: () => !!task.value.startTime,
+  set: (val: boolean) => {
     if (val) {
-      file.value.startTime = {
+      task.value.startTime = {
         hours: 0,
         minutes: 0,
         seconds: 0,
         milliseconds: 0,
       };
     } else {
-      delete file.value.startTime;
-      delete file.value.endTime;
-    }
-  },
-})
-
-const endTimeEnable = ref({
-  getter: () => !!file.value.endTime,
-  setter: (val: boolean) => {
-    if (val) {
-      file.value.endTime = {
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-        milliseconds: 0,
-      };
-    } else {
-      delete file.value.endTime;
+      delete task.value.startTime;
+      delete task.value.endTime;
     }
   },
 });
+
+const endTimeEnable = computed({
+  get: () => !!task.value.endTime,
+  set: (val: boolean) => {
+    if (val) {
+      task.value.endTime = {
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        milliseconds: 0,
+      };
+    } else {
+      delete task.value.endTime;
+    }
+  },
+});
+
+const onSave = () => {
+  emits("update", task.value);
+};
+
+const onDelete = () => {
+  emits("delete", task.value);
+};
 </script>
 
 <style scoped lang="scss"></style>
