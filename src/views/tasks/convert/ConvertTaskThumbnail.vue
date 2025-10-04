@@ -6,17 +6,18 @@
   >
     <div class="text-red-400">{{ file.inputPath }}</div>
     <div class="text-green-600">{{ file.outputPath }}</div>
-    <div v-if="(file.startTimeEnable && file.startTime) || (file.endTimeEnable && file.endTime)">
+    <div v-if="!!file.startTime || !!file.endTime">
       {{ formatTime(file.startTime) }}&nbsp;<->&nbsp;{{ formatTime(file.endTime) }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { ConvertParameter } from "@/core/task";
 import { formatTime } from "@/utils/time";
 
 defineProps<{
-  file: SingleFileModel;
+  file: ConvertParameter;
 }>();
 
 defineEmits<{

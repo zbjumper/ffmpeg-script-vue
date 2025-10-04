@@ -26,20 +26,20 @@
       </el-form-item>
       <el-form-item label="设定开始时间">
         <div class="flex flex-row items-center">
-          <el-switch v-model="file.startTimeEnable" />
+          <el-switch v-model="startTimeEnable" />
           <time-selector
-            v-if="file.startTimeEnable && file.startTime"
+            v-if="startTimeEnable && file.startTime"
             v-model="file.startTime"
           />
         </div>
       </el-form-item>
 
       <!-- 当开始时间开启时，显示设定结束时间 -->
-      <el-form-item label="设定结束时间" v-if="file.startTimeEnable">
+      <el-form-item label="设定结束时间" v-if="startTimeEnable">
         <div class="flex flex-row items-center">
-          <el-switch v-model="file.endTimeEnable" />
+          <el-switch v-model="endTimeEnable" />
           <time-selector
-            v-if="file.endTimeEnable && file.endTime"
+            v-if="endTimeEnable && file.endTime"
             v-model="file.endTime"
           />
         </div>
@@ -49,11 +49,12 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { ref } from "vue";
 import TimeSelector from "@/components/TimeSelector.vue";
 import { getDefaultOutputFilePath } from "@/utils/file";
+import type { ConvertParameter } from "@/core/task";
 
-const file = defineModel<SingleFileModel>({
+const file = defineModel<ConvertParameter>({
   type: Object,
   required: true,
 });
@@ -76,33 +77,38 @@ const onInputFileBlur = () => {
 //   }
 // );
 
-watch(
-  () => file.value.startTimeEnable,
-  (enable) => {
-    if (enable && !file.value.startTime) {
+const startTimeEnable = ref({
+  getter: () => !!file.value.startTime,
+  setter: (val: boolean) => {
+    if (val) {
       file.value.startTime = {
         hours: 0,
         minutes: 0,
         seconds: 0,
         milliseconds: 0,
       };
+    } else {
+      delete file.value.startTime;
+      delete file.value.endTime;
     }
-  }
-);
+  },
+})
 
-watch(
-  () => file.value.endTimeEnable,
-  (enable) => {
-    if (enable && !file.value.endTime) {
+const endTimeEnable = ref({
+  getter: () => !!file.value.endTime,
+  setter: (val: boolean) => {
+    if (val) {
       file.value.endTime = {
         hours: 0,
         minutes: 0,
         seconds: 0,
         milliseconds: 0,
       };
+    } else {
+      delete file.value.endTime;
     }
-  }
-);
+  },
+});
 </script>
 
 <style scoped lang="scss"></style>

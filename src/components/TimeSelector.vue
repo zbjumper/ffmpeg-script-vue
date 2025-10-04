@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-
+import type { TimePoint } from "@/core/basic";
 
 defineProps<{
   modelValue: TimePoint;

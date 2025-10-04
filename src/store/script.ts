@@ -1,24 +1,24 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { defaultGlobalOptions } from "@/constant";
+import { defaultConvertGlobalParameter } from "@/constant";
 import { computeTimeOptions } from "@/utils/time";
 import { computeVideoSizeOptions } from "@/utils/video";
+import type { GlobalConvertParameter, TaskSingleton } from "@/core/task";
 
 export const useScriptStore = defineStore("script", () => {
-  const files = ref<SingleFileModel[]>([]);
+  const files = ref<TaskSingleton[]>([]);
 
-  const globalOptions = ref<GlobalOptions>(defaultGlobalOptions);
+  const globalOptions = ref<GlobalConvertParameter>(defaultConvertGlobalParameter);
 
   const reset = () => {
     files.value = [];
-    globalOptions.value = defaultGlobalOptions;
+    globalOptions.value = defaultConvertGlobalParameter;
   };
 
   const outputScript = computed(() => {
     // You may need to define startTimeEnable, endTimeEnable, startTime, endTime, crf, etc.
     // For now, only basic script generation is implemented.
     return files.value
-      .filter((file) => file.modelType == "file")
       .map((file) => {
         let params = [
           `ffmpeg`,
@@ -29,10 +29,7 @@ export const useScriptStore = defineStore("script", () => {
           `-crf ${globalOptions.value.crf}`,
           `-c:a ${globalOptions.value.audioCodec}`,
           `-b:a 128k`,
-          computeTimeOptions(
-            file.startTimeEnable ? file.startTime : undefined,
-            file.endTimeEnable ? file.endTime : undefined
-          ),
+          computeTimeOptions(file.startTime, file.endTime),
           globalOptions.value.overwrite ? `-y` : null,
           `"${file.outputPath}"`,
         ];

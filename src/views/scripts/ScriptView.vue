@@ -13,7 +13,9 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-          <el-button class="ml-2" type="primary" @click="handleRenameTask">添加重命名任务</el-button>
+          <el-button class="ml-2" type="primary" @click="handleRenameTask"
+            >添加重命名任务</el-button
+          >
         </div>
       </el-form-item>
       <el-form-item label="任务列表" required>
@@ -48,10 +50,7 @@
       v-model="isDrawerShow"
       @close="() => {}"
     >
-      <SingleVideoDetail
-        v-if="inEditingFile"
-        v-model="inEditingFile"
-      />
+      <SingleVideoDetail v-if="inEditingFile" v-model="inEditingFile" />
       <template #footer>
         <div class="dialog-footer">
           <el-button type="primary" @click="onEditorChanged(inEditingFile)">保存并关闭</el-button>
@@ -73,34 +72,35 @@
 <script setup lang="ts">
 import { ElMessage } from "element-plus";
 import { useScriptStore } from "@/store/";
-import SingleVideoDetail from "./single/SingleVideoDetail.vue";
-import SingleVideoThumbnail from "./single/SingleVideoThumbnail.vue";
+import SingleVideoDetail from "../tasks/convert/ConvertTaskEditor.vue";
+import SingleVideoThumbnail from "../tasks/convert/ConvertTaskThumbnail.vue";
 import { ref } from "vue";
 import { v4 as uuid } from "uuid";
 import { getDefaultOutputFilePath } from "@/utils/file";
+import type { ConvertTask } from "@/core/task";
+import { defaultConvertGlobalParameter } from "@/constant";
 
 const scriptStore = useScriptStore();
 
 const isDrawerShow = ref(false);
-const inEditingFile = ref<SingleFileModel | null>(null);
+const inEditingFile = ref<ConvertTask | null>(null);
 
 const showDrawer = (index: number) => {
-  if (index >= 0) {
-    inEditingFile.value = scriptStore.files[index] as SingleFileModel;
+  if (index >= 0 && index < scriptStore.files.length) {
+    inEditingFile.value = scriptStore.files[index]!;
   } else {
     inEditingFile.value = {
       id: uuid(),
+      type: "convert",
       inputPath: "",
       outputPath: "",
-      modelType: "file",
-      startTimeEnable: false,
-      endTimeEnable: false,
+      ...defaultConvertGlobalParameter,
     };
   }
   isDrawerShow.value = true;
 };
 
-const onEditorChanged = (file: SingleFileModel) => {
+const onEditorChanged = (file: ConvertTask) => {
   const idx = scriptStore.files.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
     // 修改已有的文件
@@ -112,7 +112,7 @@ const onEditorChanged = (file: SingleFileModel) => {
   isDrawerShow.value = false;
 };
 
-const onDelete = (file: SingleFileModel) => {
+const onDelete = (file: ConvertTask) => {
   const idx = scriptStore.files.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
     scriptStore.files.splice(idx, 1);
@@ -161,17 +161,14 @@ const onChooseFiles = () => {
       for (const fileHandle of fileHandles) {
         const file = await fileHandle.getFile();
         if (file) {
-          scriptStore.files.push({
+          const item: ConvertTask = {
             id: uuid(),
+            type: "convert",
             inputPath: file.name,
             outputPath: getDefaultOutputFilePath(file.name),
-            modelType: "file",
-            isAdd: false,
-            startTimeEnable: false,
-            endTimeEnable: false,
-            removeOrigin: false,
-            commonOptions: {},
-          } as SingleFileModel);
+            ...defaultConvertGlobalParameter,
+          };
+          scriptStore.files.push(item);
         }
       }
     })
