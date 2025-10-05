@@ -1,6 +1,6 @@
 <!-- 脚本表单 -->
 <template>
-  <div class="w-[1280px]">
+  <div class="w-full">
     <el-form label-width="120px" class="m-4">
       <el-form-item label="操作内容" prop="">
         <div class="flex flex-row justify-start">
@@ -21,13 +21,13 @@
       <el-form-item label="任务列表" required>
         <div class="flex items-center flex-wrap">
           <template
-            v-if="scriptStore.files.length > 0"
-            v-for="file in scriptStore.files"
-            :key="file.id"
+            v-if="scriptStore.tasks.length > 0"
+            v-for="(task, index) in scriptStore.tasks"
+            :key="task.id"
           >
             <ConvertTaskThumbnail
-              :file="file"
-              @click="showDrawer(scriptStore.files.indexOf(file))"
+              :file="task"
+              @click="showEditorDialog(index)"
             />
           </template>
         </div>
@@ -44,13 +44,13 @@
     </el-form>
     <div>{{ scriptStore.outputScript }}</div>
     <el-dialog
-      v-if="inEditingFile"
+      v-if="editingTask"
       title="新建/编辑"
       width="600px"
-      v-model="isDrawerShow"
+      v-model="showEditingDialog"
       @close="() => {}"
     >
-      <ConvertTaskEditor :task="inEditingFile" @update="onUpdateTask" @delete="onDelete" />
+      <ConvertTaskEditor :task="editingTask" @update="onUpdateTask" @delete="onDelete" />
     </el-dialog>
   </div>
 </template>
@@ -60,22 +60,30 @@ import { ElMessage } from "element-plus";
 import { useScriptStore } from "@/store/";
 import ConvertTaskEditor from "../tasks/convert/ConvertTaskEditor.vue";
 import ConvertTaskThumbnail from "../tasks/convert/ConvertTaskThumbnail.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { v4 as uuid } from "uuid";
 import { getDefaultOutputFilePath } from "@/utils/file";
-import type { ConvertTask } from "@/core/task";
+import type { ConvertTask, TaskSingleton } from "@/core/task";
 import { defaultConvertGlobalParameter } from "@/constant";
 
 const scriptStore = useScriptStore();
 
-const isDrawerShow = ref(false);
-const inEditingFile = ref<ConvertTask | null>(null);
+const editingTask = ref<TaskSingleton | null>(null);
 
-const showDrawer = (index: number) => {
-  if (index >= 0 && index < scriptStore.files.length) {
-    inEditingFile.value = scriptStore.files[index]!;
+const showEditingDialog = computed({
+  get: () => editingTask.value !== null,
+  set: (val: boolean) => {
+    if (!val) {
+      editingTask.value = null;
+    }
+  },
+});
+
+const showEditorDialog = (index: number) => {
+  if (index >= 0 && index < scriptStore.tasks.length) {
+    editingTask.value = scriptStore.tasks[index]!;
   } else {
-    inEditingFile.value = {
+    editingTask.value = {
       id: uuid(),
       type: "convert",
       inputPath: "",
@@ -83,27 +91,26 @@ const showDrawer = (index: number) => {
       ...defaultConvertGlobalParameter,
     };
   }
-  isDrawerShow.value = true;
 };
 
 const onUpdateTask = (file: ConvertTask) => {
-  const idx = scriptStore.files.findIndex((f) => f.id === file.id);
+  const idx = scriptStore.tasks.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
     // 修改已有的文件
-    scriptStore.files[idx] = file;
+    scriptStore.tasks[idx] = file;
   } else {
     // 添加新的文件
-    scriptStore.files.splice(scriptStore.files.length - 1, 0, file);
+    scriptStore.tasks.splice(scriptStore.tasks.length - 1, 0, file);
   }
-  isDrawerShow.value = false;
+  editingTask.value = null;
 };
 
 const onDelete = (file: ConvertTask) => {
-  const idx = scriptStore.files.findIndex((f) => f.id === file.id);
+  const idx = scriptStore.tasks.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
-    scriptStore.files.splice(idx, 1);
+    scriptStore.tasks.splice(idx, 1);
   }
-  isDrawerShow.value = false;
+  editingTask.value = null;
 };
 
 const onCopyScript = () => {
@@ -122,7 +129,7 @@ const handleCommand = (command: string) => {
   if (command === "choose-files") {
     onChooseFiles();
   } else if (command === "manual-add") {
-    showDrawer(-1);
+    showEditorDialog(-1);
   }
 };
 
@@ -154,7 +161,7 @@ const onChooseFiles = () => {
             outputPath: getDefaultOutputFilePath(file.name),
             ...defaultConvertGlobalParameter,
           };
-          scriptStore.files.push(item);
+          scriptStore.tasks.push(item);
         }
       }
     })

@@ -4,49 +4,53 @@ import { defaultConvertGlobalParameter } from "@/constant";
 import { computeTimeOptions } from "@/utils/time";
 import { computeVideoSizeOptions } from "@/utils/video";
 import type { GlobalConvertParameter, TaskSingleton } from "@/core/task";
+import { match } from "ts-pattern";
 
 export const useScriptStore = defineStore("script", () => {
-  const files = ref<TaskSingleton[]>([]);
+  const tasks = ref<TaskSingleton[]>([]);
 
-  const globalOptions = ref<GlobalConvertParameter>(defaultConvertGlobalParameter);
+  const globalConvertParameter = ref<GlobalConvertParameter>(defaultConvertGlobalParameter);
 
   const reset = () => {
-    files.value = [];
-    globalOptions.value = defaultConvertGlobalParameter;
+    tasks.value = [];
+    globalConvertParameter.value = defaultConvertGlobalParameter;
   };
 
   const outputScript = computed(() => {
-    // You may need to define startTimeEnable, endTimeEnable, startTime, endTime, crf, etc.
-    // For now, only basic script generation is implemented.
-    return files.value
-      .map((file) => {
-        let params = [
-          `ffmpeg`,
-          computeTimeOptions(file.startTime, file.endTime),
-          `-i "${file.inputPath}"`,
-          computeVideoSizeOptions(globalOptions.value.clarity),
-          `-c:v ${globalOptions.value.videoCodec}`,
-          `-preset slow`,
-          `-crf ${globalOptions.value.crf}`,
-          `-c:a ${globalOptions.value.audioCodec}`,
-          `-b:a 128k`,
-          globalOptions.value.overwrite ? `-y` : null,
-          `"${file.outputPath}"`,
-        ];
-        console.info(params);
+    const shells = tasks.value.map((singleton) => {
+      return match(singleton)
+        .with({ type: "convert" }, (convertTask) => {
+          return [
+            [
+              `ffmpeg`,
+              computeTimeOptions(convertTask.startTime, convertTask.endTime),
+              `-i "${convertTask.inputPath}"`,
+              computeVideoSizeOptions(globalConvertParameter.value.clarity),
+              `-c:v ${globalConvertParameter.value.videoCodec}`,
+              `-preset slow`,
+              `-crf ${globalConvertParameter.value.crf}`,
+              `-c:a ${globalConvertParameter.value.audioCodec}`,
+              `-b:a 128k`,
+              globalConvertParameter.value.overwrite ? `-y` : null,
+              `"${convertTask.outputPath}"`,
+            ]
+              .filter((item) => item != null)
+              .join(" "),
+            globalConvertParameter.value.removeOrigin ? `rm "${convertTask.inputPath}"` : null,
+          ]
+            .filter((item) => item != null)
+            .flatMap((item) => item!)
+            .join(" && ");
+        })
+        .exhaustive();
+    });
 
-        let shells = [params.filter((item) => item != null).join(" ")];
-        if (globalOptions.value.removeOrigin) {
-          shells.push(`rm "${file.inputPath}"`);
-        }
-        return shells.join(" && ");
-      })
-      .join(" && ");
+    return shells.join(" && ");
   });
 
   return {
-    files,
-    globalOptions,
+    tasks,
+    globalConvertParameter,
     outputScript,
     reset,
   };
