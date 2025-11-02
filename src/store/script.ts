@@ -1,19 +1,23 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { defaultConvertGlobalParameter } from "@/constant";
+import { defaultConvertGlobalParameter, defaultRenameGlobalParameter } from "@/constant";
 import { computeTimeOptions } from "@/utils/time";
 import { computeVideoSizeOptions } from "@/utils/video";
-import type { GlobalConvertParameter, TaskSingleton } from "@/core/task";
-import { match } from "ts-pattern";
+import type { GlobalConvertParameter, SingletonTask } from "@/core/task";
+import { match, P } from "ts-pattern";
+import type { GlobalRenameParameter } from "@/core/task/rename";
+import { computeRenameOutputPath } from "@/utils/rename";
 
 export const useScriptStore = defineStore("script", () => {
-  const tasks = ref<TaskSingleton[]>([]);
+  const tasks = ref<SingletonTask[]>([]);
 
   const globalConvertParameter = ref<GlobalConvertParameter>(defaultConvertGlobalParameter);
+  const globalRenameParameter = ref<GlobalRenameParameter>(defaultRenameGlobalParameter);
 
   const reset = () => {
     tasks.value = [];
     globalConvertParameter.value = defaultConvertGlobalParameter;
+    globalRenameParameter.value = defaultRenameGlobalParameter;
   };
 
   const outputScript = computed(() => {
@@ -42,6 +46,14 @@ export const useScriptStore = defineStore("script", () => {
             .flatMap((item) => item!)
             .join(" && ");
         })
+        .with({ type: "rename" }, (renameTask) => {
+          let result = match(renameTask)
+            .with({ rules: P.array() }, (task) =>
+              computeRenameOutputPath(renameTask.inputPath, task.rules)
+            )
+            .otherwise(() => renameTask.inputPath);
+          return `mv "${renameTask.inputPath}" "${result}"`;
+        })
         .exhaustive();
     });
 
@@ -51,6 +63,7 @@ export const useScriptStore = defineStore("script", () => {
   return {
     tasks,
     globalConvertParameter,
+    globalRenameParameter,
     outputScript,
     reset,
   };

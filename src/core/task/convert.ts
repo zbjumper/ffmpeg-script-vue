@@ -59,7 +59,7 @@ export type ConvertParameter = Partial<GlobalConvertParameter> & {
 };
 
 /**
- * 砖混任务
+ * 转换任务
  */
 export type ConvertTask = ConvertParameter & {
   id: string;

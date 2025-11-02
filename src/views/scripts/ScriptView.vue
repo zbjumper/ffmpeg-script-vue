@@ -4,7 +4,7 @@
     <el-form label-width="120px" class="m-4">
       <el-form-item label="操作内容" prop="">
         <div class="flex flex-row justify-start">
-          <el-dropdown split-button type="primary" @command="handleCommand">
+          <el-dropdown split-button type="primary" @command="handleConvertTask">
             添加转换任务
             <template #dropdown>
               <el-dropdown-menu>
@@ -25,10 +25,12 @@
             v-for="(task, index) in scriptStore.tasks"
             :key="task.id"
           >
-            <ConvertTaskThumbnail
-              :file="task"
-              @click="showEditorDialog(index)"
-            />
+            <template v-if="task.type == 'convert'">
+              <ConvertTaskThumbnail :file="task" @click="showEditorDialog(index)" />
+            </template>
+            <template v-if="task.type == 'rename'">
+              <RenameTaskThumbnail :file="task" @click="showEditorDialog(index)" />
+            </template>
           </template>
         </div>
       </el-form-item>
@@ -50,7 +52,12 @@
       v-model="showEditingDialog"
       @close="() => {}"
     >
-      <ConvertTaskEditor :task="editingTask" @update="onUpdateTask" @delete="onDelete" />
+      <template v-if="editingTask.type == 'convert'">
+        <ConvertTaskEditor :task="editingTask" @update="onUpdateTask" @delete="onDeleteTask" />
+      </template>
+      <template v-if="editingTask.type == 'rename'">
+        <RenameTaskEditor :task="editingTask" @update="onUpdateTask" @delete="onDeleteTask" />
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -59,16 +66,19 @@
 import { ElMessage } from "element-plus";
 import { useScriptStore } from "@/store/";
 import ConvertTaskEditor from "../tasks/convert/ConvertTaskEditor.vue";
+import RenameTaskEditor from "../tasks/rename/RenameTaskEditor.vue";
 import ConvertTaskThumbnail from "../tasks/convert/ConvertTaskThumbnail.vue";
+import RenameTaskThumbnail from "../tasks/rename/RenameTaskThumbnail.vue";
 import { computed, ref } from "vue";
 import { v4 as uuid } from "uuid";
 import { getDefaultOutputFilePath } from "@/utils/file";
-import type { ConvertTask, TaskSingleton } from "@/core/task";
-import { defaultConvertGlobalParameter } from "@/constant";
+import type { ConvertTask, RenameTask, SingletonTask } from "@/core/task";
+import { defaultConvertGlobalParameter, defaultRenameGlobalParameter } from "@/constant";
+import { match } from "ts-pattern";
 
 const scriptStore = useScriptStore();
 
-const editingTask = ref<TaskSingleton | null>(null);
+const editingTask = ref<SingletonTask | null>(null);
 
 const showEditingDialog = computed({
   get: () => editingTask.value !== null,
@@ -92,7 +102,7 @@ const showEditorDialog = (index: number) => {
   }
 };
 
-const onUpdateTask = (file: ConvertTask) => {
+const onUpdateTask = (file: SingletonTask) => {
   const idx = scriptStore.tasks.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
     // 修改已有的文件
@@ -104,7 +114,7 @@ const onUpdateTask = (file: ConvertTask) => {
   editingTask.value = null;
 };
 
-const onDelete = (file: ConvertTask) => {
+const onDeleteTask = (file: SingletonTask) => {
   const idx = scriptStore.tasks.findIndex((f) => f.id === file.id);
   if (idx >= 0) {
     scriptStore.tasks.splice(idx, 1);
@@ -124,19 +134,19 @@ const onCopyScript = () => {
     });
 };
 
-const handleCommand = (command: string) => {
+const handleConvertTask = (command: string) => {
   if (command === "choose-files") {
-    onChooseFiles();
+    onChooseFiles("convert");
   } else if (command === "manual-add") {
     showEditorDialog(-1);
   }
 };
 
 const handleRenameTask = () => {
-  // scriptStore.addRenameTask();
+  onChooseFiles("rename");
 };
 
-const onChooseFiles = () => {
+const onChooseFiles = (taskType: "convert" | "rename") => {
   window
     .showOpenFilePicker({
       multiple: true,
@@ -153,13 +163,27 @@ const onChooseFiles = () => {
       for (const fileHandle of fileHandles) {
         const file = await fileHandle.getFile();
         if (file) {
-          const item: ConvertTask = {
-            id: uuid(),
-            inputPath: file.name,
-            outputPath: getDefaultOutputFilePath(file.name),
-            ...defaultConvertGlobalParameter,
-          };
-          scriptStore.tasks.push(item);
+          const task = match<"convert" | "rename", SingletonTask>(taskType)
+            .with("convert", () => {
+              const item: ConvertTask = {
+                id: uuid(),
+                inputPath: file.name,
+                outputPath: getDefaultOutputFilePath(file.name),
+                ...defaultConvertGlobalParameter,
+              };
+              return item;
+            })
+            .with("rename", () => {
+              const item: RenameTask = {
+                id: uuid(),
+                inputPath: file.name,
+                ...defaultRenameGlobalParameter,
+              };
+              return item;
+            })
+            .exhaustive();
+
+          scriptStore.tasks.push(task);
         }
       }
     })
