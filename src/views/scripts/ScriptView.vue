@@ -85,7 +85,6 @@ const showEditorDialog = (index: number) => {
   } else {
     editingTask.value = {
       id: uuid(),
-      type: "convert",
       inputPath: "",
       outputPath: "",
       ...defaultConvertGlobalParameter,
@@ -156,7 +155,6 @@ const onChooseFiles = () => {
         if (file) {
           const item: ConvertTask = {
             id: uuid(),
-            type: "convert",
             inputPath: file.name,
             outputPath: getDefaultOutputFilePath(file.name),
             ...defaultConvertGlobalParameter,

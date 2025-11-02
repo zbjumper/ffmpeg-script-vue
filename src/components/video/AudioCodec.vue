@@ -10,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import type { AudioCodec } from '@/core/basic';
+
 const model = defineModel<AudioCodec>();
 </script>
 

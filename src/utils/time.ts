@@ -1,3 +1,5 @@
+import type { TimePoint } from "@/core/basic";
+
 /**
  * 将时间模型格式化为 FFmpeg 时间格式 (hh:mm:ss.SSS)
  * @param time 时间模型

@@ -1,6 +1,7 @@
 import type { AudioCodec, TimePoint, VideoCodec } from "@/core/basic";
 
 export type GlobalConvertParameter = {
+  type: "convert";
   /**
    * 视频编码器
    */

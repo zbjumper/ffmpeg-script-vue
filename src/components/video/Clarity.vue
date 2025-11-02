@@ -10,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import type { Clarity } from '@/core/basic';
+
 const model = defineModel<Clarity>();
 </script>
 

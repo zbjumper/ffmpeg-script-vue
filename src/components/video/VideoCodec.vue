@@ -10,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+import type { VideoCodec } from '@/core/basic';
+
 defineOptions({
   name: "VideoCodec",
 });
