@@ -5,7 +5,7 @@ LABEL maintainer="Bill Zhang <zbjumper@gmail.com>"
 # 默认编码为 UTF-8
 ENV LANG C.UTF-8
 
-ENV TIME_ZONE=Asia/Shanghai
+ENV TIME_ZONE Asia/Shanghai
 
 RUN echo 'http://mirrors.ustc.edu.cn/alpine/v3.21/main' > /etc/apk/repositories \
     && echo 'http://mirrors.ustc.edu.cn/alpine/v3.21/community' >>/etc/apk/repositories \
